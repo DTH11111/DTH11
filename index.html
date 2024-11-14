@@ -4,9 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitor de Temperatura y Humedad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #data-display {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
+    <h1>Datos de Temperatura y Humedad</h1>
     <div id="data-display">Cargando datos...</div>
+    <div id="error-message" class="error" style="display:none;"></div>
     
     <!-- Importa Firebase y firebase-config.js -->
     <script type="module" src="./firebase-config.js"></script>
@@ -15,18 +30,28 @@
         import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.x/firebase-database.js";
 
         const dataDisplay = document.getElementById("data-display");
+        const errorMessage = document.getElementById("error-message");
 
-        // Define la referencia de la base de datos
-        const sensorRef = ref(db, "sensor"); // Cambia 'sensorDataPath' a la ruta correcta de tus datos en Firebase
+        // Cambia esta ruta según la ubicación de tus datos en Firebase
+        const sensorRef = ref(db, "sensors/esp32");  // Ejemplo de ruta
 
-        // Lee los datos y actualiza el HTML
+        // Lee los datos de Firebase
         onValue(sensorRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
+                // Si los datos existen, muéstralos
                 dataDisplay.innerHTML = Humedad: ${data.humedad}% <br> Temperatura: ${data.temperatura}°C;
+                errorMessage.style.display = "none";  // Ocultar mensaje de error
             } else {
+                // Si no se encuentran datos
                 dataDisplay.innerHTML = "No se encontraron datos.";
+                errorMessage.style.display = "none";  // Ocultar mensaje de error
             }
+        }, (error) => {
+            // Manejo de errores
+            dataDisplay.innerHTML = "Error al cargar los datos.";
+            errorMessage.innerHTML = Error: ${error.message};
+            errorMessage.style.display = "block";  // Mostrar mensaje de error
         });
     </script>
 </body>
