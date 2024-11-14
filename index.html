@@ -2,57 +2,44 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor de Temperatura y Humedad</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #data-display {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .error {
-            color: red;
-        }
-    </style>
+    <title>Datos de Temperatura y Humedad</title>
+    <script type="module">
+        // Importa las funciones necesarias desde los SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBiGQvtCuowFFzQJEoSNdc94oRBL8_8k4A",
+            authDomain: "esp32-dth22.firebaseapp.com",
+            databaseURL: "https://esp32-dth22-default-rtdb.firebaseio.com",
+            projectId: "esp32-dth22",
+            storageBucket: "esp32-dth22.firebasestorage.app",
+            messagingSenderId: "276351802784",
+            appId: "1:276351802784:web:1ac67db7745344a23118c5",
+            measurementId: "G-43YHBQFRS2"
+        };
+
+        // Inicializa Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+
+        // Obtén una referencia a la base de datos
+        const dbRef = ref(database, 'sensor');
+
+        // Lee los datos de temperatura y humedad
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            document.getElementById("temperatura").innerText = data.temperatura;
+            document.getElementById("humedad").innerText = data.humedad;
+        });
+    </script>
 </head>
 <body>
     <h1>Datos de Temperatura y Humedad</h1>
-    <div id="data-display">Cargando datos...</div>
-    <div id="error-message" class="error" style="display:none;"></div>
-    
-    <!-- Importa Firebase y firebase-config.js -->
-    <script type="module" src="./firebase-config.js"></script>
-    <script type="module">
-        import { db } from './firebase-config.js';
-        import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.x/firebase-database.js";
-
-        const dataDisplay = document.getElementById("data-display");
-        const errorMessage = document.getElementById("error-message");
-
-        // Cambia esta ruta según la ubicación de tus datos en Firebase
-        const sensorRef = ref(db, "sensors/esp32");  // Ejemplo de ruta
-
-        // Lee los datos de Firebase
-        onValue(sensorRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                // Si los datos existen, muéstralos
-                dataDisplay.innerHTML = Humedad: ${data.humedad}% <br> Temperatura: ${data.temperatura}°C;
-                errorMessage.style.display = "none";  // Ocultar mensaje de error
-            } else {
-                // Si no se encuentran datos
-                dataDisplay.innerHTML = "No se encontraron datos.";
-                errorMessage.style.display = "none";  // Ocultar mensaje de error
-            }
-        }, (error) => {
-            // Manejo de errores
-            dataDisplay.innerHTML = "Error al cargar los datos.";
-            errorMessage.innerHTML = Error: ${error.message};
-            errorMessage.style.display = "block";  // Mostrar mensaje de error
-        });
-    </script>
+    <p>Temperatura: <span id="temperatura"></span> °C</p>
+    <p>Humedad: <span id="humedad"></span> %</p>
 </body>
 </html>
