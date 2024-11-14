@@ -1,1 +1,37 @@
-<h1> Hola mundo</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Datos de Temperatura y Humedad</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        // Configuración de Firebase
+        var firebaseConfig = {
+            apiKey: "<TU_API_KEY>",
+            authDomain: "<TU_AUTH_DOMAIN>",
+            databaseURL: "<TU_DATABASE_URL>",
+            projectId: "<TU_PROJECT_ID>",
+            storageBucket: "<TU_STORAGE_BUCKET>",
+            messagingSenderId: "<TU_SENDER_ID>",
+            appId: "<TU_APP_ID>"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Leer datos de Firebase
+        window.onload = function() {
+            const dbRef = firebase.database().ref("sensor");
+            dbRef.on("value", (snapshot) => {
+                const data = snapshot.val();
+                document.getElementById("temp").innerText = "Temperatura: " + data.temperature + "°C";
+                document.getElementById("hum").innerText = "Humedad: " + data.humidity + "%";
+            });
+        };
+    </script>
+</head>
+<body>
+    <h1>Datos en Tiempo Real</h1>
+    <p id="temp">Temperatura: -</p>
+    <p id="hum">Humedad: -</p>
+</body>
+</html>
